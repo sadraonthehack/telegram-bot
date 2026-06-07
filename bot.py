@@ -16,7 +16,7 @@ if not os.path.exists(BOT_DIR):
     os.mkdir(BOT_DIR)
 
 files_defaults = {
-    "Kheshab.txt": "سلام چطوری؟\nخوبی؟\nچیکار میکنی؟\n",
+    "Kheshab.txt": "ONLINE",
     "targetid.txt": "1",
     "Caption.txt": "",
     "time.txt": "2",
@@ -173,7 +173,7 @@ async def help_command(event):
 **Coded by BrianMoser - MERGED BY JUST LISA**
 
 
-**OWNER CHANNEL** → https://t.me/c/3534966395/2
+**OWNER CHANNEL** → https://t.me/nahuhnothinghere/4
 """)
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/setfwd (https?://t\.me/[^\s]+)$', re.IGNORECASE)))
