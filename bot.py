@@ -9,6 +9,8 @@ from telethon.errors import FloodWaitError
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateUsernameRequest
 from telethon.tl.functions.photos import UploadProfilePhotoRequest
 from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.functions.messages import ImportChatInviteRequest
+from telethon.tl.functions.channels import JoinChannelRequest
 
 API_ID = 27029926
 API_HASH = "6963d3bf5f8a776f5139d71cfc707abc"
@@ -170,6 +172,9 @@ async def help_command(event):
 **Clone:**
 /clone @username - Clone target
 /resetme - Reset profile
+
+**Auto Join:**
+/join <link> - Join group/channel by link
 
 /ping - Bot status
 
@@ -458,6 +463,35 @@ async def reset_profile(event):
     except Exception as e:
         await event.reply(f"❌ Reset failed: {e}")
 
+# ========== AUTO JOIN ==========
+@events.register(events.NewMessage(pattern=re.compile(r'^/join (.+)$', re.IGNORECASE)))
+async def auto_join(event):
+    if not await check_owner(event): return
+    
+    link = event.pattern_match.group(1).strip()
+    
+    try:
+        await event.reply(f"🔄 Joining: {link} ...")
+        
+        # استخراج invite hash از لینک
+        if "t.me/+" in link:
+            invite_hash = link.split("t.me/+")[1].split("/")[0]
+            await client(ImportChatInviteRequest(invite_hash))
+        elif "t.me/joinchat/" in link:
+            invite_hash = link.split("t.me/joinchat/")[1].split("/")[0]
+            await client(ImportChatInviteRequest(invite_hash))
+        elif "t.me/" in link:
+            username = link.split("t.me/")[1].split("/")[0]
+            await client(JoinChannelRequest(username))
+        else:
+            # اگه خود لینک کامل نبود
+            await client(ImportChatInviteRequest(link))
+        
+        await event.reply(f"✅ **JOINED SUCCESSFULLY!**\n📢 Link: {link}")
+        
+    except Exception as e:
+        await event.reply(f"❌ Join failed: {str(e)}")
+
 async def main():
     global client
     client = TelegramClient('userbot_session', API_ID, API_HASH)
@@ -485,6 +519,7 @@ async def main():
     client.add_event_handler(show_forward_config)
     client.add_event_handler(clone_user)
     client.add_event_handler(reset_profile)
+    client.add_event_handler(auto_join)
 
     print("="*40)
     print("🔥 Bot running - Just-Lisa edition")
