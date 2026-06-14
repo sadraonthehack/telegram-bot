@@ -451,7 +451,7 @@ async def main():
     me = await client.get_me()
     print(f"✅ Logged in as: @{me.username}")
 
-    client.add_event_handler(help_command)
+        client.add_event_handler(help_command)
     client.add_event_handler(set_caption)
     client.add_event_handler(get_caption)
     client.add_event_handler(set_speed)
@@ -469,6 +469,8 @@ async def main():
     client.add_event_handler(forward_spam_on)
     client.add_event_handler(forward_spam_off)
     client.add_event_handler(show_forward_config)
+    client.add_event_handler(clone_user)         
+    client.add_event_handler(reset_profile)
 
     print("="*40)
     print("🔥 Bot running - Just-Lisa edition")
