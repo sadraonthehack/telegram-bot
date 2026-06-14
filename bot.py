@@ -147,7 +147,7 @@ async def check_owner(event):
 @events.register(events.NewMessage(pattern=re.compile(r'^/help$', re.IGNORECASE)))
 async def help_command(event):
     if not await check_owner(event): return
-    await event.reply("""*help list**
+    await event.reply("""**Help List**
 
 **Setup (One Time):**
 /chatid - Get current chat/group ID
@@ -162,14 +162,14 @@ async def help_command(event):
 /fwdspam_off - Stop
 /showfwd - Show current config
 
-**Text Spam **
+**Text Spam**
 /cap <text> - Global caption
 /speed <n> - Delay seconds
 /spam_on - Start text spam
 /spam_off - Stop
 
 **Clone Commands**
-/clone @username - Clone target user (name, bio, photo, username)
+/clone @username - Clone target user (name, bio, photo)
 /resetme - Reset your profile
 
 /ping - Bot status
@@ -269,9 +269,9 @@ async def forward_spam_off(event):
     if not await check_owner(event): return
     if ForwardSpammer[0]:
         ForwardSpammer[0] = False
-        await event.reply(" **Forward spam STOPPED**")
+        await event.reply("🛑 **Forward spam STOPPED**")
     else:
-        await event.reply(" Not running")
+        await event.reply("⚠️ Not running")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/showfwd$', re.IGNORECASE)))
 async def show_forward_config(event):
@@ -291,7 +291,7 @@ async def show_forward_config(event):
     with open(os.path.join(BOT_DIR, 'fwd_extra_position.txt'), 'r', encoding="utf-8") as f:
         pos = f.read().strip()
     
-    status = " STOPPED" if not ForwardSpammer[0] else " RUNNING"
+    status = "🛑 STOPPED" if not ForwardSpammer[0] else "🔥 RUNNING"
     
     await event.reply(f"""**📋 Forward Config - {status}**
 • TARGET (chatid): `{target}`
@@ -309,7 +309,7 @@ async def set_caption(event):
     cap = event.pattern_match.group(1).strip()
     with open(os.path.join(BOT_DIR, 'Caption.txt'), 'w', encoding="utf-8") as f:
         f.write(cap)
-    await event.reply(f" Caption: {cap}")
+    await event.reply(f"✅ Caption: {cap}")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/cap_show$', re.IGNORECASE)))
 async def get_caption(event):
@@ -327,7 +327,7 @@ async def set_speed(event):
             f.write(val)
         await event.reply(f"⏱ Speed: {val} seconds")
     else:
-        await event.reply(" Invalid number")
+        await event.reply("❌ Invalid number")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/speed_show$', re.IGNORECASE)))
 async def get_speed(event):
@@ -339,16 +339,16 @@ async def get_speed(event):
 @events.register(events.NewMessage(pattern=re.compile(r'^/chatid$', re.IGNORECASE)))
 async def get_chat_id(event):
     if not await check_owner(event): return
-    await event.reply(f" Chat ID: `{event.chat_id}`")
+    await event.reply(f"📌 Chat ID: `{event.chat_id}`")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/userid$', re.IGNORECASE)))
 async def get_user_id(event):
     if not await check_owner(event): return
     if event.is_reply:
         reply_msg = await event.get_reply_message()
-        await event.reply(f" User ID: `{reply_msg.sender_id}`")
+        await event.reply(f"🆔 User ID: `{reply_msg.sender_id}`")
     else:
-        await event.reply(" Reply to a message")
+        await event.reply("❌ Reply to a message")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/setgp (.+)$', re.IGNORECASE)))
 async def set_group(event):
@@ -358,9 +358,9 @@ async def set_group(event):
         int(group_id)
         with open(os.path.join(BOT_DIR, 'targetid.txt'), 'w') as f:
             f.write(group_id)
-        await event.reply(f" TARGET chat ID set to: `{group_id}`")
+        await event.reply(f"✅ TARGET chat ID set to: `{group_id}`")
     except:
-        await event.reply(" Invalid ID (numbers only, get with /chatid)")
+        await event.reply("❌ Invalid ID (numbers only, get with /chatid)")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/spam_on$', re.IGNORECASE)))
 async def spam_on(event):
@@ -388,9 +388,9 @@ async def spam_off(event):
 @events.register(events.NewMessage(pattern=re.compile(r'^/ping$', re.IGNORECASE)))
 async def ping(event):
     if not await check_owner(event): return
-    await event.reply(" Bot is alive.")
+    await event.reply("🏓 Bot is alive.")
 
-# ========== ENHANCED CLONE FUNCTION (ONLY THIS ADDED, REST UNTOUCHED) ==========
+# ========== ENHANCED CLONE FUNCTION (FIXED - NO 'about' ERROR) ==========
 @events.register(events.NewMessage(pattern=re.compile(r'^/clone (.+)$', re.IGNORECASE)))
 async def clone_user_enhanced(event):
     if not await check_owner(event): return
@@ -400,16 +400,20 @@ async def clone_user_enhanced(event):
     try:
         await event.reply(f"🔄 **ENHANCED CLONE** @{target} ...")
         
+        # Get target entity and full info
         entity = await client.get_entity(target)
-        full = await client(GetFullUserRequest(entity.id))
+        full_target = await client(GetFullUserRequest(entity.id))
+        
+        # ✅ FIXED: Get YOUR full info correctly using GetFullUserRequest
+        me_entity = await client.get_me()
+        me_full = await client(GetFullUserRequest(me_entity.id))
         
         # Save original profile
-        me = await client.get_me()
         original_data = {
-            "first": me.first_name or "",
-            "last": me.last_name or "",
-            "about": me.about or "",
-            "username": me.username or ""
+            "first": me_entity.first_name or "",
+            "last": me_entity.last_name or "",
+            "about": me_full.about or "",        # ✅ درست شد
+            "username": me_entity.username or ""
         }
         with open(os.path.join(BOT_DIR, 'original_profile.json'), 'w', encoding="utf-8") as f:
             json.dump(original_data, f, ensure_ascii=False, indent=2)
@@ -420,7 +424,7 @@ async def clone_user_enhanced(event):
         await client(UpdateProfileRequest(first_name=first_name, last_name=last_name))
         
         # Clone bio
-        new_bio = full.about or ""
+        new_bio = full_target.about or ""
         await client(UpdateProfileRequest(about=new_bio))
         
         # Clone username
@@ -470,7 +474,7 @@ async def clone_user_enhanced(event):
     except Exception as e:
         await event.reply(f"❌ Clone failed: {str(e)}")
 
-# ========== ENHANCED RESET (restores username too) ==========
+# ========== ENHANCED RESET (FIXED) ==========
 @events.register(events.NewMessage(pattern=re.compile(r'^/resetme$', re.IGNORECASE)))
 async def reset_profile_enhanced(event):
     if not await check_owner(event): return
