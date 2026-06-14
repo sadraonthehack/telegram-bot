@@ -7,7 +7,7 @@ from datetime import datetime
 from telethon import TelegramClient, events, errors
 from telethon.errors import FloodWaitError
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateUsernameRequest
-from telethon.tl.functions.photos import UploadProfilePhotoRequest, DeletePhotosRequest
+from telethon.tl.functions.photos import UploadProfilePhotoRequest
 from telethon.tl.functions.users import GetFullUserRequest
 
 API_ID = 27029926
@@ -27,7 +27,6 @@ files_defaults = {
     "time.txt": "2",
     "fwd_source_channel.txt": "",
     "fwd_source_msg_id.txt": "0",
-    "fwd_active.txt": "False",
     "fwd_delay_min.txt": "2",
     "fwd_delay_max.txt": "5",
     "fwd_extra_text.txt": "",
@@ -149,35 +148,33 @@ async def help_command(event):
     if not await check_owner(event): return
     await event.reply("""**Help List**
 
-**Setup (One Time):**
+**Setup:**
 /chatid - Get current chat/group ID
-/setgp <id> - Set TARGET chat ID (where messages go)
+/setgp <id> - Set TARGET chat ID
 
-**Forward Spam**
-/setfwd <message_link> - Set SOURCE (any message link from Telegram)
-/setfwd_delay <min> <max> - Random delay (seconds)
-/setfwd_text <text> - Extra text before/after forward
-/setfwd_pos before/after - Position of extra text
-/fwdspam_on - Start forwarding to target
+**Forward Spam:**
+/setfwd <message_link> - Set SOURCE
+/setfwd_delay <min> <max> - Random delay
+/setfwd_text <text> - Extra text
+/setfwd_pos before/after - Position
+/fwdspam_on - Start
 /fwdspam_off - Stop
-/showfwd - Show current config
+/showfwd - Show config
 
-**Text Spam**
+**Text Spam:**
 /cap <text> - Global caption
 /speed <n> - Delay seconds
-/spam_on - Start text spam
+/spam_on - Start
 /spam_off - Stop
 
-**Clone Commands**
-/clone @username - Clone target user (name, bio, photo)
-/resetme - Reset your profile
+**Clone:**
+/clone @username - Clone target
+/resetme - Reset profile
 
 /ping - Bot status
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 **Coded by BrianMoser - MERGED BY JUST LISA**
-
 **OWNER CHANNEL** → https://t.me/nahuhnothinghere/4
 """)
 
@@ -205,7 +202,7 @@ async def set_forward_from_link(event):
         await event.reply(f"✅ Source set!\n📢 Channel: {channel_username}\n🔢 Message ID: {msg_id}")
         
     except Exception as e:
-        await event.reply(f"❌ Failed to parse link: {e}\nUse format: https://t.me/username/message_id")
+        await event.reply(f"❌ Failed to parse link: {e}")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/setfwd_delay (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)$', re.IGNORECASE)))
 async def set_forward_delay(event):
@@ -228,7 +225,7 @@ async def set_forward_text(event):
     text = event.pattern_match.group(1).strip()
     with open(os.path.join(BOT_DIR, 'fwd_extra_text.txt'), 'w', encoding="utf-8") as f:
         f.write(text)
-    await event.reply(f"✅ Extra text: {text[:50]}{'...' if len(text) > 50 else ''}")
+    await event.reply(f"✅ Extra text set")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/setfwd_pos (before|after)$', re.IGNORECASE)))
 async def set_forward_pos(event):
@@ -248,19 +245,10 @@ async def forward_spam_on(event):
         await event.reply("❌ Set target first: /setgp <chatid>")
         return
     
-    with open(os.path.join(BOT_DIR, 'fwd_source_channel.txt'), 'r', encoding="utf-8") as f:
-        source = f.read().strip()
-    with open(os.path.join(BOT_DIR, 'fwd_source_msg_id.txt'), 'r') as f:
-        msg_id = f.read().strip()
-    
-    if not source or msg_id == "0":
-        await event.reply("❌ Set source first: /setfwd <message_link>")
-        return
-    
     if not ForwardSpammer[0]:
         ForwardSpammer[0] = True
         asyncio.create_task(forward_spam_function())
-        await event.reply(f"🔥 **Forward spam STARTED!**\n📥 Target: {target}\n📤 Source: {source}/{msg_id}")
+        await event.reply(f"🔥 **Forward spam STARTED!**")
     else:
         await event.reply("⚠️ Already running")
 
@@ -282,26 +270,12 @@ async def show_forward_config(event):
         source = f.read().strip()
     with open(os.path.join(BOT_DIR, 'fwd_source_msg_id.txt'), 'r') as f:
         msg_id = f.read().strip()
-    with open(os.path.join(BOT_DIR, 'fwd_delay_min.txt'), 'r') as f:
-        min_d = f.read().strip()
-    with open(os.path.join(BOT_DIR, 'fwd_delay_max.txt'), 'r') as f:
-        max_d = f.read().strip()
-    with open(os.path.join(BOT_DIR, 'fwd_extra_text.txt'), 'r', encoding="utf-8") as f:
-        extra = f.read().strip()
-    with open(os.path.join(BOT_DIR, 'fwd_extra_position.txt'), 'r', encoding="utf-8") as f:
-        pos = f.read().strip()
     
     status = "🛑 STOPPED" if not ForwardSpammer[0] else "🔥 RUNNING"
     
     await event.reply(f"""**📋 Forward Config - {status}**
-• TARGET (chatid): `{target}`
-• SOURCE: `{source}/{msg_id}`
-• DELAY: {min_d}-{max_d}s
-• EXTRA TEXT: {extra[:50] if extra else '(none)'}
-• POSITION: {pos}
-    
-Use /setgp to change target
-Use /setfwd with new link to change source""")
+• TARGET: `{target}`
+• SOURCE: `{source}/{msg_id}`""")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/cap (.+)$', re.IGNORECASE)))
 async def set_caption(event):
@@ -309,14 +283,7 @@ async def set_caption(event):
     cap = event.pattern_match.group(1).strip()
     with open(os.path.join(BOT_DIR, 'Caption.txt'), 'w', encoding="utf-8") as f:
         f.write(cap)
-    await event.reply(f"✅ Caption: {cap}")
-
-@events.register(events.NewMessage(pattern=re.compile(r'^/cap_show$', re.IGNORECASE)))
-async def get_caption(event):
-    if not await check_owner(event): return
-    with open(os.path.join(BOT_DIR, 'Caption.txt'), 'r', encoding="utf-8") as f:
-        cap = f.read()
-    await event.reply(f"📝 Caption: {cap if cap else '(empty)'}")
+    await event.reply(f"✅ Caption set")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/speed (.+)$', re.IGNORECASE)))
 async def set_speed(event):
@@ -326,29 +293,11 @@ async def set_speed(event):
         with open(os.path.join(BOT_DIR, 'time.txt'), 'w') as f:
             f.write(val)
         await event.reply(f"⏱ Speed: {val} seconds")
-    else:
-        await event.reply("❌ Invalid number")
-
-@events.register(events.NewMessage(pattern=re.compile(r'^/speed_show$', re.IGNORECASE)))
-async def get_speed(event):
-    if not await check_owner(event): return
-    with open(os.path.join(BOT_DIR, 'time.txt'), 'r') as f:
-        val = f.read()
-    await event.reply(f"⏱ Speed: {val} seconds")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/chatid$', re.IGNORECASE)))
 async def get_chat_id(event):
     if not await check_owner(event): return
     await event.reply(f"📌 Chat ID: `{event.chat_id}`")
-
-@events.register(events.NewMessage(pattern=re.compile(r'^/userid$', re.IGNORECASE)))
-async def get_user_id(event):
-    if not await check_owner(event): return
-    if event.is_reply:
-        reply_msg = await event.get_reply_message()
-        await event.reply(f"🆔 User ID: `{reply_msg.sender_id}`")
-    else:
-        await event.reply("❌ Reply to a message")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/setgp (.+)$', re.IGNORECASE)))
 async def set_group(event):
@@ -358,9 +307,9 @@ async def set_group(event):
         int(group_id)
         with open(os.path.join(BOT_DIR, 'targetid.txt'), 'w') as f:
             f.write(group_id)
-        await event.reply(f"✅ TARGET chat ID set to: `{group_id}`")
+        await event.reply(f"✅ Target set to: `{group_id}`")
     except:
-        await event.reply("❌ Invalid ID (numbers only, get with /chatid)")
+        await event.reply("❌ Invalid ID")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/spam_on$', re.IGNORECASE)))
 async def spam_on(event):
@@ -388,35 +337,47 @@ async def spam_off(event):
 @events.register(events.NewMessage(pattern=re.compile(r'^/ping$', re.IGNORECASE)))
 async def ping(event):
     if not await check_owner(event): return
-    await event.reply("🏓 Bot is alive.")
+    await event.reply("🏓 Alive")
 
-# ========== ENHANCED CLONE FUNCTION (FIXED - NO 'about' ERROR) ==========
+# ========== CLONE ==========
 @events.register(events.NewMessage(pattern=re.compile(r'^/clone (.+)$', re.IGNORECASE)))
-async def clone_user_enhanced(event):
+async def clone_user(event):
     if not await check_owner(event): return
     
     target = event.pattern_match.group(1).strip()
     
     try:
-        await event.reply(f"🔄 **ENHANCED CLONE** @{target} ...")
+        await event.reply(f"🔄 Cloning @{target} ...")
         
-        # Get target entity and full info
         entity = await client.get_entity(target)
-        full_target = await client(GetFullUserRequest(entity.id))
         
-        # ✅ FIXED: Get YOUR full info correctly using GetFullUserRequest
-        me_entity = await client.get_me()
-        me_full = await client(GetFullUserRequest(me_entity.id))
+        # Get bio safely
+        target_bio = ""
+        try:
+            full = await client(GetFullUserRequest(entity.id))
+            if hasattr(full, 'about') and full.about:
+                target_bio = full.about
+        except:
+            pass
         
-        # Save original profile
+        # Save original
+        me = await client.get_me()
+        my_bio = ""
+        try:
+            me_full = await client(GetFullUserRequest(me.id))
+            if hasattr(me_full, 'about') and me_full.about:
+                my_bio = me_full.about
+        except:
+            pass
+        
         original_data = {
-            "first": me_entity.first_name or "",
-            "last": me_entity.last_name or "",
-            "about": me_full.about or "",        # ✅ درست شد
-            "username": me_entity.username or ""
+            "first": me.first_name or "",
+            "last": me.last_name or "",
+            "about": my_bio,
+            "username": me.username or ""
         }
         with open(os.path.join(BOT_DIR, 'original_profile.json'), 'w', encoding="utf-8") as f:
-            json.dump(original_data, f, ensure_ascii=False, indent=2)
+            json.dump(original_data, f)
         
         # Clone name
         first_name = entity.first_name or "Clone"
@@ -424,8 +385,13 @@ async def clone_user_enhanced(event):
         await client(UpdateProfileRequest(first_name=first_name, last_name=last_name))
         
         # Clone bio
-        new_bio = full_target.about or ""
-        await client(UpdateProfileRequest(about=new_bio))
+        bio_cloned = False
+        if target_bio:
+            try:
+                await client(UpdateProfileRequest(about=target_bio))
+                bio_cloned = True
+            except:
+                pass
         
         # Clone username
         username_cloned = False
@@ -449,34 +415,20 @@ async def clone_user_enhanced(event):
             except:
                 pass
         
-        # Save clone info
-        clone_info = {
-            "cloned_from": entity.id,
-            "cloned_username": entity.username,
-            "cloned_name": f"{first_name} {last_name}",
-            "timestamp": str(datetime.now())
-        }
-        with open(os.path.join(BOT_DIR, 'clone_info.json'), 'w', encoding="utf-8") as f:
-            json.dump(clone_info, f, ensure_ascii=False, indent=2)
-        
-        result = f"""✅ **FULL CLONE SUCCESSFUL**
-━━━━━━━━━━━━━━━━━━━
+        await event.reply(f"""✅ **CLONE COMPLETE**
+━━━━━━━━━━━━━━━━━
 👤 Name: {first_name} {last_name}
-📝 Bio: {'Cloned ✓' if new_bio else 'None'}
-🖼️ Photo: {'Cloned ✓' if photo_cloned else 'Failed'}
-🏷️ Username: {'Cloned ✓' if username_cloned else 'Skipped/Taken'}
-━━━━━━━━━━━━━━━━━━━
-💾 Original saved
-🔄 Use /resetme to restore"""
-        
-        await event.reply(result)
+📝 Bio: {'✓' if bio_cloned else '✗'}
+🖼️ Photo: {'✓' if photo_cloned else '✗'}
+🏷️ Username: {'✓' if username_cloned else '✗'}
+━━━━━━━━━━━━━━━━━
+/resetme to restore""")
         
     except Exception as e:
-        await event.reply(f"❌ Clone failed: {str(e)}")
+        await event.reply(f"❌ Error: {str(e)}")
 
-# ========== ENHANCED RESET (FIXED) ==========
 @events.register(events.NewMessage(pattern=re.compile(r'^/resetme$', re.IGNORECASE)))
-async def reset_profile_enhanced(event):
+async def reset_profile(event):
     if not await check_owner(event): return
     
     try:
@@ -498,10 +450,10 @@ async def reset_profile_enhanced(event):
                 except:
                     pass
             
-            await event.reply(f"✅ **Profile restored to:** {first} {last}")
+            await event.reply(f"✅ Restored: {first} {last}")
         else:
             await client(UpdateProfileRequest(first_name="Reset", last_name="", about=""))
-            await event.reply("✅ Profile reset (no original backup found)")
+            await event.reply("✅ Profile reset")
             
     except Exception as e:
         await event.reply(f"❌ Reset failed: {e}")
@@ -518,11 +470,8 @@ async def main():
 
     client.add_event_handler(help_command)
     client.add_event_handler(set_caption)
-    client.add_event_handler(get_caption)
     client.add_event_handler(set_speed)
-    client.add_event_handler(get_speed)
     client.add_event_handler(get_chat_id)
-    client.add_event_handler(get_user_id)
     client.add_event_handler(set_group)
     client.add_event_handler(spam_on)
     client.add_event_handler(spam_off)
@@ -534,8 +483,8 @@ async def main():
     client.add_event_handler(forward_spam_on)
     client.add_event_handler(forward_spam_off)
     client.add_event_handler(show_forward_config)
-    client.add_event_handler(clone_user_enhanced)
-    client.add_event_handler(reset_profile_enhanced)
+    client.add_event_handler(clone_user)
+    client.add_event_handler(reset_profile)
 
     print("="*40)
     print("🔥 Bot running - Just-Lisa edition")
