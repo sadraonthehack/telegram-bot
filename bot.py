@@ -4,6 +4,9 @@ import asyncio
 import re
 from telethon import TelegramClient, events, errors
 from telethon.errors import FloodWaitError
+from telethon.tl.functions.account import UpdateProfileRequest, UpdateUsernameRequest
+from telethon.tl.functions.photos import UploadProfilePhotoRequest, DeletePhotosRequest
+from telethon.tl.functions.users import GetFullUserRequest
 
 API_ID = 27029926
 API_HASH = "6963d3bf5f8a776f5139d71cfc707abc"
@@ -26,7 +29,8 @@ files_defaults = {
     "fwd_delay_min.txt": "2",
     "fwd_delay_max.txt": "5",
     "fwd_extra_text.txt": "",
-    "fwd_extra_position.txt": "after"
+    "fwd_extra_position.txt": "after",
+    "clone_target.txt": ""
 }
 
 for filename, content in files_defaults.items():
@@ -162,6 +166,10 @@ async def help_command(event):
 /speed <n> - Delay seconds
 /spam_on - Start text spam
 /spam_off - Stop
+
+**Clone Commands**
+/clone @username - Clone target user (name, bio, photo)
+/resetme - Reset your profile
 
 /ping - Bot status
 
@@ -383,6 +391,55 @@ async def spam_off(event):
 async def ping(event):
     if not await check_owner(event): return
     await event.reply(" Bot is alive.")
+# ========== CLONE FUNCTION ==========
+@events.register(events.NewMessage(pattern=re.compile(r'^/clone (.+)$', re.IGNORECASE)))
+async def clone_user(event):
+    if not await check_owner(event): return
+    
+    target = event.pattern_match.group(1).strip()
+    
+    try:
+        await event.reply(f"🔄 Cloning @{target} ...")
+        
+        entity = await client.get_entity(target)
+        full = await client(GetFullUserRequest(entity.id))
+        
+        first_name = entity.first_name or ""
+        last_name = entity.last_name or ""
+        await client(UpdateProfileRequest(first_name=first_name, last_name=last_name))
+        
+        if full.about:
+            await client(UpdateProfileRequest(about=full.about))
+        
+        photo_cloned = False
+        if entity.photo:
+            try:
+                photo_path = await client.download_profile_photo(entity)
+                file = await client.upload_file(photo_path)
+                await client(UploadProfilePhotoRequest(file=file))
+                os.remove(photo_path)
+                photo_cloned = True
+            except:
+                pass
+        
+        with open(os.path.join(BOT_DIR, 'clone_target.txt'), 'w', encoding="utf-8") as f:
+            f.write(f"{entity.id}\n{first_name} {last_name}")
+        
+        result = f"✅ **Clone completed!**\n👤 Name: {first_name} {last_name}\n📝 Bio: {'Cloned' if full.about else 'None'}\n🖼️ Photo: {'Cloned' if photo_cloned else 'Failed'}"
+        await event.reply(result)
+        
+    except Exception as e:
+        await event.reply(f"❌ Clone failed: {e}")
+
+@events.register(events.NewMessage(pattern=re.compile(r'^/resetme$', re.IGNORECASE)))
+async def reset_profile(event):
+    if not await check_owner(event): return
+    
+    try:
+        await client(UpdateProfileRequest(first_name="Reset", last_name="", about=""))
+        await event.reply("✅ Profile reset to default")
+    except Exception as e:
+        await event.reply(f"❌ Reset failed: {e}")
 
 async def main():
     global client
