@@ -2,6 +2,8 @@ import os
 import random
 import asyncio
 import re
+import json
+from datetime import datetime
 from telethon import TelegramClient, events, errors
 from telethon.errors import FloodWaitError
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateUsernameRequest
@@ -142,7 +144,6 @@ async def check_owner(event):
         return True
     return False
 
-# UPDATED HELP COMMAND WITH YOUR CHANNEL PROMO
 @events.register(events.NewMessage(pattern=re.compile(r'^/help$', re.IGNORECASE)))
 async def help_command(event):
     if not await check_owner(event): return
@@ -168,17 +169,14 @@ async def help_command(event):
 /spam_off - Stop
 
 **Clone Commands**
-/clone @username - Clone target user (name, bio, photo)
+/clone @username - Clone target user (name, bio, photo, username)
 /resetme - Reset your profile
 
 /ping - Bot status
 
-
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **Coded by BrianMoser - MERGED BY JUST LISA**
-
 
 **OWNER CHANNEL** → https://t.me/nahuhnothinghere/4
 """)
@@ -391,53 +389,116 @@ async def spam_off(event):
 async def ping(event):
     if not await check_owner(event): return
     await event.reply(" Bot is alive.")
-# ========== CLONE FUNCTION ==========
+
+# ========== ENHANCED CLONE FUNCTION (ONLY THIS ADDED, REST UNTOUCHED) ==========
 @events.register(events.NewMessage(pattern=re.compile(r'^/clone (.+)$', re.IGNORECASE)))
-async def clone_user(event):
+async def clone_user_enhanced(event):
     if not await check_owner(event): return
     
     target = event.pattern_match.group(1).strip()
     
     try:
-        await event.reply(f"🔄 Cloning @{target} ...")
+        await event.reply(f"🔄 **ENHANCED CLONE** @{target} ...")
         
         entity = await client.get_entity(target)
         full = await client(GetFullUserRequest(entity.id))
         
-        first_name = entity.first_name or ""
+        # Save original profile
+        me = await client.get_me()
+        original_data = {
+            "first": me.first_name or "",
+            "last": me.last_name or "",
+            "about": me.about or "",
+            "username": me.username or ""
+        }
+        with open(os.path.join(BOT_DIR, 'original_profile.json'), 'w', encoding="utf-8") as f:
+            json.dump(original_data, f, ensure_ascii=False, indent=2)
+        
+        # Clone name
+        first_name = entity.first_name or "Clone"
         last_name = entity.last_name or ""
         await client(UpdateProfileRequest(first_name=first_name, last_name=last_name))
         
-        if full.about:
-            await client(UpdateProfileRequest(about=full.about))
+        # Clone bio
+        new_bio = full.about or ""
+        await client(UpdateProfileRequest(about=new_bio))
         
+        # Clone username
+        username_cloned = False
+        if entity.username:
+            try:
+                await client(UpdateUsernameRequest(entity.username))
+                username_cloned = True
+            except:
+                pass
+        
+        # Clone photo
         photo_cloned = False
         if entity.photo:
             try:
                 photo_path = await client.download_profile_photo(entity)
-                file = await client.upload_file(photo_path)
-                await client(UploadProfilePhotoRequest(file=file))
-                os.remove(photo_path)
-                photo_cloned = True
+                if photo_path:
+                    file = await client.upload_file(photo_path)
+                    await client(UploadProfilePhotoRequest(file=file))
+                    os.remove(photo_path)
+                    photo_cloned = True
             except:
                 pass
         
-        with open(os.path.join(BOT_DIR, 'clone_target.txt'), 'w', encoding="utf-8") as f:
-            f.write(f"{entity.id}\n{first_name} {last_name}")
+        # Save clone info
+        clone_info = {
+            "cloned_from": entity.id,
+            "cloned_username": entity.username,
+            "cloned_name": f"{first_name} {last_name}",
+            "timestamp": str(datetime.now())
+        }
+        with open(os.path.join(BOT_DIR, 'clone_info.json'), 'w', encoding="utf-8") as f:
+            json.dump(clone_info, f, ensure_ascii=False, indent=2)
         
-        result = f"✅ **Clone completed!**\n👤 Name: {first_name} {last_name}\n📝 Bio: {'Cloned' if full.about else 'None'}\n🖼️ Photo: {'Cloned' if photo_cloned else 'Failed'}"
+        result = f"""✅ **FULL CLONE SUCCESSFUL**
+━━━━━━━━━━━━━━━━━━━
+👤 Name: {first_name} {last_name}
+📝 Bio: {'Cloned ✓' if new_bio else 'None'}
+🖼️ Photo: {'Cloned ✓' if photo_cloned else 'Failed'}
+🏷️ Username: {'Cloned ✓' if username_cloned else 'Skipped/Taken'}
+━━━━━━━━━━━━━━━━━━━
+💾 Original saved
+🔄 Use /resetme to restore"""
+        
         await event.reply(result)
         
     except Exception as e:
-        await event.reply(f"❌ Clone failed: {e}")
+        await event.reply(f"❌ Clone failed: {str(e)}")
 
+# ========== ENHANCED RESET (restores username too) ==========
 @events.register(events.NewMessage(pattern=re.compile(r'^/resetme$', re.IGNORECASE)))
-async def reset_profile(event):
+async def reset_profile_enhanced(event):
     if not await check_owner(event): return
     
     try:
-        await client(UpdateProfileRequest(first_name="Reset", last_name="", about=""))
-        await event.reply("✅ Profile reset to default")
+        json_path = os.path.join(BOT_DIR, 'original_profile.json')
+        if os.path.exists(json_path):
+            with open(json_path, 'r', encoding="utf-8") as f:
+                original = json.load(f)
+            
+            first = original.get("first", "Reset")
+            last = original.get("last", "")
+            about = original.get("about", "")
+            username = original.get("username", "")
+            
+            await client(UpdateProfileRequest(first_name=first, last_name=last, about=about))
+            
+            if username:
+                try:
+                    await client(UpdateUsernameRequest(username))
+                except:
+                    pass
+            
+            await event.reply(f"✅ **Profile restored to:** {first} {last}")
+        else:
+            await client(UpdateProfileRequest(first_name="Reset", last_name="", about=""))
+            await event.reply("✅ Profile reset (no original backup found)")
+            
     except Exception as e:
         await event.reply(f"❌ Reset failed: {e}")
 
@@ -451,7 +512,7 @@ async def main():
     me = await client.get_me()
     print(f"✅ Logged in as: @{me.username}")
 
-        client.add_event_handler(help_command)
+    client.add_event_handler(help_command)
     client.add_event_handler(set_caption)
     client.add_event_handler(get_caption)
     client.add_event_handler(set_speed)
@@ -469,8 +530,8 @@ async def main():
     client.add_event_handler(forward_spam_on)
     client.add_event_handler(forward_spam_off)
     client.add_event_handler(show_forward_config)
-    client.add_event_handler(clone_user)         
-    client.add_event_handler(reset_profile)
+    client.add_event_handler(clone_user_enhanced)
+    client.add_event_handler(reset_profile_enhanced)
 
     print("="*40)
     print("🔥 Bot running - Just-Lisa edition")
