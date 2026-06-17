@@ -18,6 +18,7 @@ API_HASH = "6963d3bf5f8a776f5139d71cfc707abc"
 PHONE_NUMBER = "+989053716748"
 
 OWNERS = {"usernames": ["DevilWillCryBitch","MY_FALAH_M", "PV_KiTANAM","Pxcio","DevilWillCry1Bitch"]}
+
 BOT_DIR = "downloads_bot1"
 if not os.path.exists(BOT_DIR):
     os.mkdir(BOT_DIR)
@@ -156,10 +157,6 @@ setgp <id> - Set TARGET chat ID
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 setfwd <message_link> - Set SOURCE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-setfwd_delay <min> <max> - min3 max 10
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-setfwd_text <text> - Extra text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 fwdspam_on - Start
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 fwdspam_off - Stop
@@ -170,9 +167,9 @@ SetFosh <text>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 speed <n> - 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-spam_on - start
+spamon - start
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-spam_off - stop
+spamoff - stop
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 **Clone:**
 clone @username - Clone target
@@ -210,7 +207,7 @@ async def set_forward_from_link(event):
         with open(os.path.join(BOT_DIR, 'fwd_source_msg_id.txt'), 'w') as f:
             f.write(str(msg_id))
             
-        await event.reply(f" Source set!\n📢 Channel: {channel_username}\n Message ID: {msg_id}")
+        await event.reply(f" Source set!\n Channel: {channel_username}\n Message ID: {msg_id}")
         
     except Exception as e:
         await event.reply(f" Failed to parse link: {e}")
@@ -303,12 +300,12 @@ async def set_speed(event):
     if val.isdigit() and int(val) > 0:
         with open(os.path.join(BOT_DIR, 'time.txt'), 'w') as f:
             f.write(val)
-        await event.reply(f"⏱ Speed: {val} seconds")
+        await event.reply(f" Speed: {val} seconds")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^chatid$', re.IGNORECASE)))
 async def get_chat_id(event):
     if not await check_owner(event): return
-    await event.reply(f"📌 Chat ID: `{event.chat_id}`")
+    await event.reply(f" ChatID: `{event.chat_id}`")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^setgp (.+)$', re.IGNORECASE)))
 async def set_group(event):
@@ -320,7 +317,7 @@ async def set_group(event):
             f.write(group_id)
         await event.reply(f"target set: `{group_id}`")
     except:
-        await event.reply("❌ Invalid ID")
+        await event.reply(" Invalid ID")
 
 @events.register(events.NewMessage(pattern=re.compile(r'^spamon$', re.IGNORECASE)))
 async def spam_on(event):
@@ -437,7 +434,7 @@ resetme to restore""")
     except Exception as e:
         await event.reply(f"❌ Error: {str(e)}")
 
-@events.register(events.NewMessage(pattern=re.compile(r'^/resetme$', re.IGNORECASE)))
+@events.register(events.NewMessage(pattern=re.compile(r'^resetme$', re.IGNORECASE)))
 async def reset_profile(event):
     if not await check_owner(event): return
     
