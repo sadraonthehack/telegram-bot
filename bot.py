@@ -145,7 +145,7 @@ async def check_owner(event):
         return True
     return False
 
-@events.register(events.NewMessage(pattern=re.compile(r'^/help$', re.IGNORECASE)))
+@events.register(events.NewMessage(pattern=re.compile(r'^help$', re.IGNORECASE)))
 async def help_command(event):
     if not await check_owner(event): return
     await event.reply("""**دستورات**
