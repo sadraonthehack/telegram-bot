@@ -24,7 +24,17 @@ if not os.path.exists(BOT_DIR):
     os.mkdir(BOT_DIR)
 
 files_defaults = {
-    "Kheshab.txt": "ONLINE",
+    "Kheshab.txt": "              .---.
+           '-.  |   |  .-'         
+             ___|   |___          
+        -=  [           ]  =-    
+            `---.   .---'         
+         __||__ |   | __||__      
+         '-..-' |   | '-..-'   
+           ||   |   |   ||     
+           ||_.-|   |-,_||     
+         .-"`   `"`'`   `"-.   
+    '                   '",
     "targetid.txt": "1",
     "Caption.txt": "",
     "time.txt": "2",
@@ -183,7 +193,18 @@ ping - Bot status
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 **Coded by BrianMoser 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-**OWNER CHANNEL if you btw** → https://t.me/nahuhnothinghere/4
+                .---.
+           '-.  |   |  .-'         
+             ___|   |___          
+        -=  [           ]  =-    
+            `---.   .---'         
+         __||__ |   | __||__      
+         '-..-' |   | '-..-'   
+           ||   |   |   ||     
+           ||_.-|   |-,_||     
+         .-"`   `"`'`   `"-.   
+    .'                   '.
+
 """)
 
 @events.register(events.NewMessage(pattern=re.compile(r'^/setfwd (https?://t\.me/[^\s]+)$', re.IGNORECASE)))
