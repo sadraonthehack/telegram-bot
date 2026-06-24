@@ -24,23 +24,33 @@ if not os.path.exists(BOT_DIR):
     os.mkdir(BOT_DIR)
 
 files_defaults = {
-    "Kheshab.txt": '''           
-       ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓       
-     █▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓▓▓█     
-   ▓▓▓▓▓▓▓▓▓▓▓████▓▓▓▓▓▓▓▓▓▓█   
-  █▓▓▓▓▓▓▓▓▓▓▓████▓▓▓▓▓▓▓▓▓▓▓█  
- ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█ 
- ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓████▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-█▓▓▓▓▓▓▓▓▓▓▓▓██████▓▓▓▓▓▓▓▓▓▓▓▓█
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓████▓▓▓▓▓▓▓▓▓▓▓▓▓▓
- ▓▓▓▓█▓████▓▓▓▓▓▓▓▓▓▓█████▓▓▓▓▓ 
- ▓▓▓▓▓████▓▓▓▓▓▓▓▓▓▓▓▓████▓▓▓▓█ 
-  █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█  
-   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█   
-     █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█     
-       ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█       
-           ███▓▓▓▓███  ''',
+    "Kheshab.txt": '''
+                          JEAAAAEJ                   
+             EEXXXXXXXXXXXXXXXXJE             
+          AXXXXXXXXXXXXXXXXXXXXXXXXA          
+        JXXXXXXXXXXXXXXAAASXXXXXXXXXXJ        
+      EXXXXXXXXXXXXXXAAAAXXXXXXXXXXXXXXE      
+     XXXXXXXXXXXXXXXAAAAAAXXXXXXXXXXXXXXXX    
+   JXXXXXXXXXXXXXXXXAAAAAAXXXXXXXXXXXXXXXXJ   
+  EXXXXXXXXXXXXXXXXXXXAASXXXXXXXXXXXXXXXXXXE  
+  EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXS  
+ AXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXA 
+ AXXXXXXXXXXXXXXXXXXXAAAAXXXXXXXXXXXXXXXXXXXE 
+AXXXXXXXXXXXXXXXXXXAAAAAAAAXXXXXXXXXXXXXXXXXXA
+AXXXXXXXXXXXXXXXXXXAAAAAAAAXXXXXXXXXXXXXXXXXXA
+AXXXXXXXXXXXXXXXXXXAAAAAAAAXXXXXXXXXXXXXXXXXXA
+ AXXXXXXXXXAAAAXXXXXXAAAAXXXXXXAAAAAXXXXXXXXE 
+ AXXXXXAXEAAAAAAXXXXXXXXXXXXXXAAAAAAAXXXXXXXA 
+  EXXXXXAAAAAAAJXXXXXXXXXXXXXXXAAAAAAEXXXXXS  
+  JXXXXXXXJAAXXXXXXXXXXXXXXXXXXXXXXAAXXXXXXJ  
+   JXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAXXXXXXJ   
+     SXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX     
+      EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXE      
+        EXXXXXXXXXXXXXXXXXXXXXXXXXXXXJ        
+          AXXXXXXXXXXXXXXXXXXXXXXXXA          
+             JEXXXXXXXXXXXXXXXXJJ             
+                   NEAAAAEN
+ ''',
     "targetid.txt": "1",
     "Caption.txt": "",
     "time.txt": "2",
@@ -199,17 +209,31 @@ ping - Bot status
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 **Coded by BrianMoser 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                .---.
-           '-.  |   |  .-'         
-             ___|   |___          
-        -=  [           ]  =-    
-            `---.   .---'         
-         __||__ |   | __||__      
-         '-..-' |   | '-..-'   
-           ||   |   |   ||     
-           ||_.-|   |-,_||     
-         .-"`   `"`'`   `"-.   
-    .'                   '.
+                   JEAAAAEJ                   
+             EEXXXXXXXXXXXXXXXXJE             
+          AXXXXXXXXXXXXXXXXXXXXXXXXA          
+        JXXXXXXXXXXXXXXAAASXXXXXXXXXXJ        
+      EXXXXXXXXXXXXXXAAAAXXXXXXXXXXXXXXE      
+     XXXXXXXXXXXXXXXAAAAAAXXXXXXXXXXXXXXXX    
+   JXXXXXXXXXXXXXXXXAAAAAAXXXXXXXXXXXXXXXXJ   
+  EXXXXXXXXXXXXXXXXXXXAASXXXXXXXXXXXXXXXXXXE  
+  EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXS  
+ AXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXA 
+ AXXXXXXXXXXXXXXXXXXXAAAAXXXXXXXXXXXXXXXXXXXE 
+AXXXXXXXXXXXXXXXXXXAAAAAAAAXXXXXXXXXXXXXXXXXXA
+AXXXXXXXXXXXXXXXXXXAAAAAAAAXXXXXXXXXXXXXXXXXXA
+AXXXXXXXXXXXXXXXXXXAAAAAAAAXXXXXXXXXXXXXXXXXXA
+ AXXXXXXXXXAAAAXXXXXXAAAAXXXXXXAAAAAXXXXXXXXE 
+ AXXXXXAXEAAAAAAXXXXXXXXXXXXXXAAAAAAAXXXXXXXA 
+  EXXXXXAAAAAAAJXXXXXXXXXXXXXXXAAAAAAEXXXXXS  
+  JXXXXXXXJAAXXXXXXXXXXXXXXXXXXXXXXAAXXXXXXJ  
+   JXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAXXXXXXJ   
+     SXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX     
+      EXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXE      
+        EXXXXXXXXXXXXXXXXXXXXXXXXXXXXJ        
+          AXXXXXXXXXXXXXXXXXXXXXXXXA          
+             JEXXXXXXXXXXXXXXXXJJ             
+                   NEAAAAEN
 
 """)
 
