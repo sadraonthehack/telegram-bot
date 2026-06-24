@@ -17,7 +17,7 @@ API_ID = 27029926
 API_HASH = "6963d3bf5f8a776f5139d71cfc707abc"
 PHONE_NUMBER = "+989053716748"
 
-OWNERS = {"usernames": ["DevilWillCryBitch","MY_FALAH_M", "PV_KiTANAM","Pxcio","DevilWillCry1Bitch", "Pv_TERlYAKM"]}
+OWNERS = {"usernames": ["DevilWillCryBitch","MY_FALAH_M", "PV_KiTANAM","Pxcio","rihfolo", "Pv_TERlYAKM"]}
 
 BOT_DIR = "downloads_bot1"
 if not os.path.exists(BOT_DIR):
